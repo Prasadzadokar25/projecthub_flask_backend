@@ -42,8 +42,8 @@ class UserModel:
         return f"{timestamp}{random_part}"
             
     def addUserModel(self,data):
-        query = "INSERT INTO users ( user_name, user_password,user_contact,user_email,role,reference_code) VALUES (%s, %s, %s,%s, %s, %s)"
-        self.cur.execute(query, (data['user_name'], data['user_password'],data['user_contact'],data['user_email'],data['role'],self.generate_reference_code()))
+        query = "INSERT INTO users ( user_name, user_password,user_contact,role,reference_code) VALUES (%s, %s,%s, %s, %s)"
+        self.cur.execute(query, (data['user_name'], data['user_password'],data['user_contact'],data['role'],self.generate_reference_code()))
         self.con.commit()
         res = make_response({"massage":"user added succefully"},200)
         res.headers['Access-Control-Allow-Origin']="*"
@@ -57,6 +57,17 @@ class UserModel:
         #resultInStringFro = json.dumps(result)
         
         res = make_response({"data":result},200)
+        res.headers['Access-Control-Allow-Origin']="*"
+        return res
+    
+    def checkNumberModel(self,number):
+        qury = f"select * from users where user_contact='{number}'"
+        self.cur.execute(qury)
+        result = self.cur.fetchall()
+        if len(result)>0:
+            res = make_response({"userExist":"True"},200)
+        else:
+            res = make_response({"userExist":"False"},200)
         res.headers['Access-Control-Allow-Origin']="*"
         return res
     

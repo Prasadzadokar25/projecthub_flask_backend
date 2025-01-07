@@ -19,8 +19,20 @@ def getUsers():
 def addUser():
     userobj = UserModel()
     data = request.get_json()
-    print(data['user_name'])
     return userobj.addUserModel(data)
+
+@app.route("/checkNumber",methods=["POST"])
+def chechNumber():
+    userobj = UserModel()
+    data = request.get_json()
+    return userobj.checkNumberModel(data['user_contact'])
+
+@app.route("/checkLogin",methods=["POST"])
+def chechNumber():
+    userobj = UserModel()
+    data = request.get_json()
+    return userobj.checkNumberModel()
+    
 
 
 # Import the controllers to register routes

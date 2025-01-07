@@ -3,6 +3,9 @@ import json
 from pymysql.cursors import DictCursor
 from flask import make_response
 from flask import request, jsonify
+import random
+import string
+import time
 
 class UserModel:
     
@@ -33,9 +36,14 @@ class UserModel:
         except pymysql.MySQLError as err:
             print(f"Failed to connect: {err}")
             
+    def generate_reference_code(self,length=6):
+        timestamp = int(time.time())  # Current timestamp
+        random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+        return f"{timestamp}{random_part}"
+            
     def addUserModel(self,data):
-        query = "INSERT INTO users ( user_name, user_password, user_description,user_contact,user_email,role,reference_code) VALUES (%s, %s, %s, %s,%s, %s, %s)"
-        self.cur.execute(query, (data['user_name'], data['user_password'], data['user_description'],data['user_contact'],data['user_email'],data['role'],data['reference_code']))
+        query = "INSERT INTO users ( user_name, user_password,user_contact,user_email,role,reference_code) VALUES (%s, %s, %s,%s, %s, %s)"
+        self.cur.execute(query, (data['user_name'], data['user_password'],data['user_contact'],data['user_email'],data['role'],self.generate_reference_code()))
         self.con.commit()
         res = make_response({"massage":"user added succefully"},200)
         res.headers['Access-Control-Allow-Origin']="*"

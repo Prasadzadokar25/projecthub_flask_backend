@@ -1,8 +1,8 @@
 from flask import Flask
 from model.user_model import UserModel
 from flask import request,send_file
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 @app.route("/")
 def welcome():
@@ -18,8 +18,10 @@ def getUsers():
 @app.route("/addUser",methods=["POST"])
 def addUser():
     userobj = UserModel()
-    print(request.form['user_name'])
-    return userobj.addUserModel(request.form)
+    data = request.get_json()
+    print(data['user_name'])
+    return userobj.addUserModel(data)
+
 
 # Import the controllers to register routes
 import controller.user_controller

@@ -1,5 +1,6 @@
 from flask import Flask
 from model.user_model import UserModel
+from model.login_model import LoginModel
 from flask import request,send_file
 
 app = Flask(__name__)
@@ -28,10 +29,10 @@ def chechNumber():
     return userobj.checkNumberModel(data['user_contact'])
 
 @app.route("/checkLogin",methods=["POST"])
-def chechNumber():
-    userobj = UserModel()
+def checkLogin():
+    userobj = LoginModel()
     data = request.get_json()
-    return userobj.checkNumberModel()
+    return userobj.checkLoginDetailsModel(data)
     
 
 

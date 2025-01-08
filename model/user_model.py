@@ -41,13 +41,23 @@ class UserModel:
         random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
         return f"{timestamp}{random_part}"
             
-    def addUserModel(self,data):
-        query = "INSERT INTO users ( user_name, user_password,user_contact,role,reference_code) VALUES (%s, %s,%s, %s, %s)"
-        self.cur.execute(query, (data['user_name'], data['user_password'],data['user_contact'],data['role'],self.generate_reference_code()))
+    def addUserModel(self, data):
+        query = """
+        INSERT INTO users (user_name, user_password, user_contact, role, reference_code)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        self.cur.execute(query, (data['user_name'], data['user_password'], data['user_contact'], data['role'], self.generate_reference_code()))
+        
+        # Fetch the last inserted ID
+        self.cur.execute("SELECT LAST_INSERT_ID()")
+        user_id = self.cur.fetchall()[0]['LAST_INSERT_ID()']
+        
         self.con.commit()
-        res = make_response({"massage":"user added succefully"},200)
-        res.headers['Access-Control-Allow-Origin']="*"
+        
+        res = make_response({"message": "User added successfully", "user_id": user_id}, 200)
+        res.headers['Access-Control-Allow-Origin'] = "*"
         return res
+
 
     
     def getUsersModel(self):
@@ -59,6 +69,20 @@ class UserModel:
         res = make_response({"data":result},200)
         res.headers['Access-Control-Allow-Origin']="*"
         return res
+    
+    def getUserByIdModel(self,id):
+        qury =f"select * from users where user_id = {id}"
+        self.cur.execute(qury)
+        result = self.cur.fetchall()
+        #resultInStringFro = json.dumps(result)
+        if(len(result)>0):
+            res = make_response({"data":result[0]},200)
+            res.headers['Access-Control-Allow-Origin']="*"
+            return res
+        else:
+            res = make_response({"error":"No user found"},204)
+            res.headers['Access-Control-Allow-Origin']="*"
+            return res
     
     def checkNumberModel(self,number):
         qury = f"select * from users where user_contact='{number}'"

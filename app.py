@@ -26,6 +26,11 @@ def addUser():
     data = request.get_json()
     return userobj.addUserModel(data)
 
+@app.route("/getUser/<id>")
+def getUserById(id):
+    userobj = UserModel()
+    return userobj.getUserByIdModel(id)
+
 @app.route("/checkNumber",methods=["POST"])
 def chechNumber():
     userobj = UserModel()

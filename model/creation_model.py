@@ -54,6 +54,51 @@ class CreationModel:
         responce = make_response({"message": "Creation added successfully"}, 200)
         responce.headers['Access-Control-Allow-Origin'] = "*"
         return responce
+    
+    def getCreationDetails(self, creation_id):
+        query = """
+        SELECT 
+            c.creation_id, 
+            c.creation_title, 
+            c.creation_description, 
+            c.creation_price, 
+            c.creation_thumbnail, 
+            c.creation_file, 
+            cat.category_name, 
+            cat.category_description, 
+            COALESCE(AVG(r.rating), 0) AS average_rating
+        FROM 
+            creations c
+        INNER JOIN 
+            categories cat ON c.category_id = cat.category_id
+        LEFT JOIN 
+            ratings r ON c.creation_id = r.creation_id
+        WHERE 
+            c.creation_id = %s
+        GROUP BY 
+            c.creation_id, c.creation_title, c.creation_description, c.creation_price, 
+            c.creation_thumbnail, c.creation_file, cat.category_name, cat.category_description
+        """
+        
+        self.cur.execute(query, (creation_id,))
+        creation_details = self.cur.fetchone()
+        
+        if creation_details:
+            result = {
+                "creation_id": creation_details[0],
+                "creation_title": creation_details[1],
+                "creation_description": creation_details[2],
+                "creation_price": creation_details[3],
+                "creation_thumbnail": creation_details[4],
+                "creation_file": creation_details[5],
+                "category_name": creation_details[6],
+                "category_description": creation_details[7],
+                "average_rating": creation_details[8]
+            }
+            return make_response(result, 200)
+        else:
+            return make_response({"message": "Creation not found"}, 404)
+
 
     def getCreations(self):
         query = "select * from Creations"

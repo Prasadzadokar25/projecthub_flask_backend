@@ -8,28 +8,28 @@ import os
 obj = CreationModel()
 
 
-@app.route("/listCreation",methods=['PUT'])
-def listCreation():
-    base_path_scorcFile = 'uploads/creation/sourcefile/'
-    base_path_thumbnail = 'uploads/creation/thumbnail/'
+# @app.route("/listCreation",methods=['PUT'])
+# def listCreation():
+#     base_path_scorcFile = 'uploads/creation/sourcefile/'
+#     base_path_thumbnail = 'uploads/creation/thumbnail/'
 
-    data = request.form
-    files = request.files
-    creation_file = files['creation_file']
-    creation_thumbnail = files['creation_thumbnail']
+#     data = request.form
+#     files = request.files
+#     creation_file = files['creation_file']
+#     creation_thumbnail = files['creation_thumbnail']
         
-    # Generate unique filenames
-    unique_filename = str(uuid.uuid4()) + os.path.splitext(creation_file.filename)[1]
-    unique_thumbnail = str(uuid.uuid4()) + os.path.splitext(creation_thumbnail.filename)[1]
+#     # Generate unique filenames
+#     unique_filename = str(uuid.uuid4()) + os.path.splitext(creation_file.filename)[1]
+#     unique_thumbnail = str(uuid.uuid4()) + os.path.splitext(creation_thumbnail.filename)[1]
     
-    creation_file.save(base_path_scorcFile+unique_filename)
-    creation_thumbnail.save(base_path_thumbnail+unique_thumbnail)
+#     creation_file.save(base_path_scorcFile+unique_filename)
+#     creation_thumbnail.save(base_path_thumbnail+unique_thumbnail)
     
-    filePaths = {
-        "souce_file":base_path_scorcFile+unique_filename,
-        "thumbnail":base_path_thumbnail+unique_thumbnail
-    }
-    return obj.listCreationModel(data,filePaths)
+#     filePaths = {
+#         "souce_file":base_path_scorcFile+unique_filename,
+#         "thumbnail":base_path_thumbnail+unique_thumbnail
+#     }
+#     return obj.listCreationModel(data,filePaths)
 
 @app.route("/getCreations",methods=['GET'])
 def getCreations():

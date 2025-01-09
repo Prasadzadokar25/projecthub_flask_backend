@@ -13,7 +13,7 @@ CORS(app)
 
 @app.route("/")
 def welcome():
-    return "hello word"
+    return "hello welcome to projecthub"
 
 # user_controller.py
 
@@ -49,15 +49,18 @@ def checkLogin():
 
 @app.route("/listCreation",methods=['POST'])
 def listCreation():
+    
+    if 'creation_thumbnail' not in request.files or 'creation_file' not in request.files:
+        return "No file part", 400
     obj = CreationModel()
     base_path_scorcFile = 'uploads/creation/sourcefile/'
     base_path_thumbnail = 'uploads/creation/thumbnail/'
-
+    print("here1")
     data = request.form
     files = request.files
     creation_file = files['creation_file']
     creation_thumbnail = files['creation_thumbnail']
-        
+    print("here1")
     # Generate unique filenames
     unique_filename = str(uuid.uuid4()) + os.path.splitext(creation_file.filename)[1]
     unique_thumbnail = str(uuid.uuid4()) + os.path.splitext(creation_thumbnail.filename)[1]
@@ -69,6 +72,7 @@ def listCreation():
         "souce_file":base_path_scorcFile+unique_filename,
         "thumbnail":base_path_thumbnail+unique_thumbnail
     }
+    print("here2")
     return obj.listCreationModel(data,filePaths)
     
 

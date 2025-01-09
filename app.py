@@ -6,8 +6,10 @@ from flask import request,send_file
 from datetime import datetime
 import uuid
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def welcome():

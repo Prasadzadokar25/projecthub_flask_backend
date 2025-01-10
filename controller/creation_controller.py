@@ -35,9 +35,9 @@ obj = CreationModel()
 def getCreations():
     return obj.getCreations()
 
-@app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
-def getthumbnail(filename):
-    return send_file(f"uploads/creation/thumbnail/{filename}")
+# @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
+# def getthumbnail(filename):
+#     return send_file(f"uploads/creation/thumbnail/{filename}")
 
 @app.route("/uploads/creation/sourcefile/<filename>",methods=['GET'])
 def getsoucefile(filename):

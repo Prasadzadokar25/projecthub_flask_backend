@@ -38,7 +38,42 @@ class LoginModel:
     def checkLoginDetailsModel(self,data):
         user_key = data['user_key']
         password = data['user_password']
-        query = f"SELECT * from users where user_contact = '{user_key}' or user_email = '{user_key}'" 
+        query = f"""SELECT 
+    u.user_id,
+    u.user_name,
+    u.user_password,
+    u.user_contact,
+    u.user_email,
+    u.wallet_money,
+    u.role,
+    u.reference_code,
+    u.profile_photo,
+    u.created_at,
+    IFNULL(bought_creations.bought_creation_number, 0) AS bought_creation_number,
+    IFNULL(listed_creations.listed_creation_number, 0) AS listed_creation_number
+FROM 
+    users u
+LEFT JOIN (
+    SELECT 
+        o.user_id,
+        COUNT(o.order_id) AS bought_creation_number
+    FROM 
+        orders o
+    GROUP BY 
+        o.user_id
+) AS bought_creations ON u.user_id = bought_creations.user_id
+LEFT JOIN (
+    SELECT 
+        c.user_id,
+        COUNT(c.creation_id) AS listed_creation_number
+    FROM 
+        creations c
+    GROUP BY 
+        c.user_id
+) AS listed_creations ON u.user_id = listed_creations.user_id
+WHERE 
+    u.user_contact = '{user_key}' or u.user_contact ='{user_key}';
+""" 
         self.cur.execute(query)
         result = self.cur.fetchall()
         if len(result)>0:

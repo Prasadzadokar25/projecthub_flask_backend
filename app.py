@@ -49,7 +49,6 @@ def checkLogin():
 
 @app.route("/listCreation",methods=['POST'])
 def listCreation():
-    
     if 'creation_thumbnail' not in request.files or 'creation_file' not in request.files:
         return "No file part", 400
     obj = CreationModel()
@@ -72,11 +71,17 @@ def listCreation():
         "souce_file":base_path_scorcFile+unique_filename,
         "thumbnail":base_path_thumbnail+unique_thumbnail
     }
-    print("here2")
     return obj.listCreationModel(data,filePaths)
+
+@app.route("/userListedCreations/<user_id>",methods=['GET'])
+def userListedCreations(user_id):
+    obj = CreationModel()
+    return obj.getUserListedCreations(user_id)
     
 
-
+@app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
+def getthumbnail(filename):
+    return send_file(f"uploads/creation/thumbnail/{filename}")
 # Import the controllers to register routes
 import controller.user_controller
 import controller.creation_controller

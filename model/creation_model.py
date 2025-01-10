@@ -37,6 +37,7 @@ class CreationModel:
         INSERT INTO creations (creation_title, creation_description, creation_price, creation_thumbnail, creation_file, category_id, keyword, creation_other_images, total_copy_sell, user_id, status)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+        
         self.cur.execute(query, (
             data['creation_title'],
             data['creation_description'],
@@ -105,6 +106,14 @@ class CreationModel:
         self.cur.execute(query)
         result = self.cur.fetchall()
         responce = make_response({"data": result}, 200)
+        return responce
+    
+    def getUserListedCreations(self,user_id):
+        query = f"select * from Creations where user_id = {user_id}"
+        self.cur.execute(query)
+        result = self.cur.fetchall()
+        responce = make_response({"data": result}, 200)
+        responce.headers['Access-Control-Allow-Origin'] = "*"
         return responce
 
         

@@ -31,9 +31,9 @@ obj = CreationModel()
 #     }
 #     return obj.listCreationModel(data,filePaths)
 
-@app.route("/getCreations",methods=['GET'])
-def getCreations():
-    return obj.getCreations()
+# @app.route("/getCreations",methods=['GET'])
+# def getCreations():
+#     return obj.getCreations()
 
 # @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
 # def getthumbnail(filename):

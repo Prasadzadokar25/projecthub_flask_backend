@@ -101,13 +101,33 @@ class CreationModel:
             return make_response({"message": "Creation not found"}, 404)
 
 
-    def getCreations(self):
-        query = "select * from Creations"
-        self.cur.execute(query)
-        result = self.cur.fetchall()
-        responce = make_response({"data": result}, 200)
+    def getCreationsModel(self,pageNo,perPage):
+        offset = (pageNo - 1) * perPage
+        self.cur.execute("SELECT * FROM creations LIMIT %s OFFSET %s", (perPage, offset))
+        creations = self.cur.fetchall()
+        responce = make_response({
+            "page_no":pageNo,
+            "per_page":perPage,
+            "data": creations,
+            }, 200)
+        responce.headers['Access-Control-Allow-Origin'] = "*"
+
         return responce
     
+    def getRecentlyAddedCreations(self,pageNo,perPage):
+        offset = (pageNo - 1) * perPage
+        self.cur.execute("SELECT * FROM creations ORDER BY createtime DESC LIMIT %s OFFSET %s", (perPage, offset))
+
+        creations = self.cur.fetchall()
+        responce = make_response({
+            "page_no":pageNo,
+            "per_page":perPage,
+            "data": creations,
+            }, 200)
+        responce.headers['Access-Control-Allow-Origin'] = "*"
+
+        return responce
+        
     def getUserListedCreations(self,user_id):
         query = f"select * from Creations where user_id = {user_id}"
         self.cur.execute(query)

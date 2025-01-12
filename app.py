@@ -77,11 +77,25 @@ def listCreation():
 def userListedCreations(user_id):
     obj = CreationModel()
     return obj.getUserListedCreations(user_id)
-    
 
+@app.route('/creations/page/<page>/perPage/<perPage>', methods=['GET'])
+def getCreations(page,perPage):
+    obj = CreationModel()
+    return obj.getCreationsModel(int(page),int(perPage))
+
+@app.route('/recentCreations/page/<page>/perPage/<perPage>', methods=['GET'])
+def recentCreations(page,perPage):
+    obj = CreationModel()
+    return obj.getRecentlyAddedCreations(int(page),int(perPage))
+    
+    
+    
+# file_controller.py
 @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
 def getthumbnail(filename):
     return send_file(f"uploads/creation/thumbnail/{filename}")
+
+
 # Import the controllers to register routes
 import controller.user_controller
 import controller.creation_controller

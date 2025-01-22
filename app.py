@@ -77,17 +77,43 @@ def listCreation():
 def userListedCreations(user_id):
     obj = CreationModel()
     return obj.getUserListedCreations(user_id)
+    
+@app.route('/creation/purched/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def purchedCreations(page,perPage,uid):
+    obj = CreationModel()
+    return obj.getPurchedCreations(int(page),int(perPage),uid)
 
-@app.route('/creations/page/<page>/perPage/<perPage>', methods=['GET'])
-def getCreations(page,perPage):
+@app.route('/creations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def getCreations(page,perPage,uid):
     obj = CreationModel()
     return obj.getCreationsModel(int(page),int(perPage))
 
-@app.route('/recentCreations/page/<page>/perPage/<perPage>', methods=['GET'])
-def recentCreations(page,perPage):
+@app.route('/recentCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def recentCreations(page,perPage,uid):
     obj = CreationModel()
     return obj.getRecentlyAddedCreations(int(page),int(perPage))
+
+  
+@app.route('/trendingCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def trendingCreations(page,perPage,uid):
+    obj = CreationModel()
+    return obj.getTrendingCreations(int(page),int(perPage))
     
+@app.route('/recomandedCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['Post'])
+def getRecomandedCreations(page,perPage,uid):
+    obj = CreationModel()
+    return obj.getTrendingCreations(int(page),int(perPage))
+
+@app.route('/creation/card/add', methods=['POST'])
+def addCreationInUserCard():
+    data = request.get_json()
+    obj = CreationModel()
+    return obj.addCreationInUserCard(data)
+
+@app.route('/creation/card/get/userid/<uid>', methods=['GET'])
+def getInCardCreations(uid):
+    obj = CreationModel()
+    return obj.getInCardCreation(uid)
     
     
 # file_controller.py
@@ -95,7 +121,17 @@ def recentCreations(page,perPage):
 def getthumbnail(filename):
     return send_file(f"uploads/creation/thumbnail/{filename}")
 
+@app.route('/uploads/creation/sourcefile/<filename>', methods=['GET'])
+def download_file(filename):
+    # Path to your ZIP file
+    file_path = f'uploads/creation/sourcefile/{filename}'
 
+    try:
+        # Send the file to the client
+        return send_file(file_path, as_attachment=True)
+    except Exception as e:
+        return str(e), 404
+    
 # Import the controllers to register routes
 import controller.user_controller
 import controller.creation_controller

@@ -1,4 +1,5 @@
 from flask import Flask
+from model.bank_account_model import BackAcountModel
 from model.user_model import UserModel
 from model.login_model import LoginModel
 from model.creation_model import CreationModel
@@ -115,6 +116,17 @@ def getInCardCreations(uid):
     obj = CreationModel()
     return obj.getInCardCreation(uid)
     
+# bank_account_controller.py
+@app.route('/add_bank_account/add', methods=['POST'])
+def add_bank_account():
+    data = request.get_json()
+    obj =BackAcountModel()
+    return obj.add_bank_account(data)
+
+@app.route('/accounts/<int:user_id>', methods=['GET'])
+def get_accounts_for_user(user_id):
+    obj =BackAcountModel()
+    return obj.get_accounts_for_user(user_id)
     
 # file_controller.py
 @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])

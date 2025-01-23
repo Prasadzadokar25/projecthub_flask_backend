@@ -7,8 +7,7 @@ class CreationModel:
     def __init__(self):
         
         # local server
-        host = "localhost"
-        
+        host = "localhost"        
         user = "root"
         password = "##Prasad25"
         database = "projecthubdb"
@@ -410,14 +409,20 @@ class CreationModel:
             'creation_other_images', c.creation_other_images,
             'total_copy_sell', c.total_copy_sell,
             'gst_percentage', g.gst_percentage,
-            'platform_fee_percentage', p.fee_percentage
-        ),
-        'seller', JSON_OBJECT(
+            'platform_fee_percentage', p.fee_percentage,
+            'average_rating', IFNULL(
+                (SELECT AVG(r.rating) 
+                 FROM ratings r 
+                 WHERE r.creation_id = c.creation_id), 0
+            ), 
+             'seller', JSON_OBJECT(
             'seller_id', s.user_id,
             'seller_name', s.user_name,
             'seller_contact', s.user_contact,
             'seller_email', s.user_email
         )
+        )
+       
     ) AS card_item_details
 FROM 
     carditems ci

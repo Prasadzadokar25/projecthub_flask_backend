@@ -410,11 +410,11 @@ class CreationModel:
             'total_copy_sell', c.total_copy_sell,
             'gst_percentage', g.gst_percentage,
             'platform_fee_percentage', p.fee_percentage,
-            'average_rating', IFNULL(
-                (SELECT AVG(r.rating) 
-                 FROM ratings r 
-                 WHERE r.creation_id = c.creation_id), 0
-            ), 
+            'average_rating',ROUND(IFNULL(
+            (SELECT AVG(r.rating) 
+             FROM ratings r 
+             WHERE r.creation_id = c.creation_id), 0
+            ), 3), 
              'seller', JSON_OBJECT(
             'seller_id', s.user_id,
             'seller_name', s.user_name,
@@ -439,7 +439,7 @@ JOIN
 JOIN 
     users s ON c.user_id = s.user_id
 WHERE 
-    ci.user_id = %s;
+    ci.user_id = %s AND ci.status = 1;
 
             """
 
@@ -459,5 +459,38 @@ WHERE
             self.con.rollback()
             response = make_response({"message": f"Error: {str(e)}"}, 500)
             response.headers['Access-Control-Allow-Origin'] = "*"
-            return response     
+            return response  
+           
+    def removeFromCart(self, data):
         
+        uid = data['user_id']
+        carditem_id = data['carditem_id']
+        try:
+            # Query to update the status of the item to 0 (removed from the cart)
+            query = """
+                UPDATE carditems
+                SET status = 0
+                WHERE user_id = %s AND carditem_id = %s AND status = 1;
+            """
+            
+            # Execute the query with the provided user_id and carditem_id
+            self.cur.execute(query, (uid, carditem_id))
+            
+            # Commit the transaction to save the changes
+            self.con.commit()
+            
+            # Check if any row was affected (to confirm the item was in the cart)
+            if self.cur.rowcount > 0:
+                response = make_response({"message": "Item removed successfully."}, 200)
+            else:
+                response = make_response({"message": "Item not found in the cart."}, 404)
+
+            response.headers['Access-Control-Allow-Origin'] = "*"  # Allowing CORS
+            return response
+
+        except Exception as e:
+            # Rollback the transaction in case of an error
+            self.con.rollback()
+            response = make_response({"message": f"Error: {str(e)}"}, 500)
+            response.headers['Access-Control-Allow-Origin'] = "*"
+            return response

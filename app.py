@@ -111,13 +111,19 @@ def addCreationInUserCard():
     obj = CreationModel()
     return obj.addCreationInUserCard(data)
 
+@app.route('/creation/card/remove', methods=['POST'])
+def removeFromCart():
+    data = request.get_json()
+    obj = CreationModel()
+    return obj.removeFromCart(data)
+
 @app.route('/creation/card/get/userid/<uid>', methods=['GET'])
 def getInCardCreations(uid):
     obj = CreationModel()
     return obj.getInCardCreation(uid)
     
 # bank_account_controller.py
-@app.route('/add_bank_account/add', methods=['POST'])
+@app.route('/add-bank-account', methods=['POST'])
 def add_bank_account():
     data = request.get_json()
     obj =BackAcountModel()
@@ -127,6 +133,11 @@ def add_bank_account():
 def get_accounts_for_user(user_id):
     obj =BackAcountModel()
     return obj.get_accounts_for_user(user_id)
+
+@app.route('/set-primary-account/<int:user_id>/<int:account_id>', methods=['PUT'])
+def set_primary_account(user_id, account_id):
+    obj = BackAcountModel()
+    return obj.set_primary_account(user_id,account_id)
     
 # file_controller.py
 @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])

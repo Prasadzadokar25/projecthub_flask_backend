@@ -342,10 +342,10 @@ class CreationModel:
             creations c ON od.creation_id = c.creation_id
         WHERE 
             o.user_id = %s
-        LIMIT %s OFFSET %s;
         """
+        # LIMIT %s OFFSET %s; //update
 
-        self.cur.execute(query, (uid,perPage,offset))
+        self.cur.execute(query, (uid)) #,perPage,offset  # update
         result = self.cur.fetchall()
         responce = make_response({"data": result, "page": pageNo, "limit": perPage}, 200)
         responce.headers['Access-Control-Allow-Origin'] = "*"
@@ -363,11 +363,12 @@ class CreationModel:
                 data['creationId'],)
         try:
             query = """
-                INSERT INTO carditems (user_id, creation_id)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE added_on = CURRENT_TIMESTAMP;
-
-            """
+            INSERT INTO carditems (user_id, creation_id, status)
+            VALUES (%s, %s, 1)  -- '1' indicates the item is active in the card
+            ON DUPLICATE KEY UPDATE 
+                status = 1,          -- Update status to active if it already exists
+                added_on = CURRENT_TIMESTAMP; -- Update the timestamp
+        """
 
             # Executing the query with data passed from the request
             self.cur.execute(query, (
@@ -465,6 +466,8 @@ WHERE
         
         uid = data['user_id']
         carditem_id = data['carditem_id']
+        print(data['user_id'])
+        print(data['carditem_id'])
         try:
             # Query to update the status of the item to 0 (removed from the cart)
             query = """

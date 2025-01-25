@@ -1,5 +1,6 @@
 from flask import Flask
 from model.bank_account_model import BackAcountModel
+from model.order_medel import OrderModel
 from model.user_model import UserModel
 from model.login_model import LoginModel
 from model.creation_model import CreationModel
@@ -138,6 +139,13 @@ def get_accounts_for_user(user_id):
 def set_primary_account(user_id, account_id):
     obj = BackAcountModel()
     return obj.set_primary_account(user_id,account_id)
+
+# payment_controller.py
+@app.route('/create-order', methods=['POST'])
+def create_order():
+    obj = OrderModel()
+    return obj.create_order()
+
     
 # file_controller.py
 @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])

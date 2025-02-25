@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
 from model.bank_account_model import BackAcountModel
+from model.category_model import categoryModel
 from model.order_medel import OrderModel
 from model.user_model import UserModel
 from model.login_model import LoginModel
@@ -29,6 +30,15 @@ def addUser():
     userobj = UserModel()
     data = request.get_json()
     return userobj.addUserModel(data)
+
+@app.route('/update_user/<int:user_id>', methods=['PATCH'])
+def updateUser(user_id):
+    userobj = UserModel()
+    data = request.form
+    files = request.files
+
+    return userobj.update_user(user_id,data,files)
+
 
 @app.route("/getUser/<id>")
 def getUserById(id):
@@ -65,10 +75,10 @@ def listCreation():
     # Generate unique filenames
     unique_filename = str(uuid.uuid4()) + os.path.splitext(creation_file.filename)[1]
     unique_thumbnail = str(uuid.uuid4()) + os.path.splitext(creation_thumbnail.filename)[1]
-    
+
     creation_file.save(base_path_scorcFile+unique_filename)
     creation_thumbnail.save(base_path_thumbnail+unique_thumbnail)
-    
+
     filePaths = {
         "souce_file":base_path_scorcFile+unique_filename,
         "thumbnail":base_path_thumbnail+unique_thumbnail
@@ -79,7 +89,7 @@ def listCreation():
 def userListedCreations(user_id):
     obj = CreationModel()
     return obj.getUserListedCreations(user_id)
-    
+
 @app.route('/creation/purched/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def purchedCreations(page,perPage,uid):
     obj = CreationModel()
@@ -95,12 +105,12 @@ def recentCreations(page,perPage,uid):
     obj = CreationModel()
     return obj.getRecentlyAddedCreations(int(page),int(perPage))
 
-  
+
 @app.route('/trendingCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def trendingCreations(page,perPage,uid):
     obj = CreationModel()
     return obj.getTrendingCreations(int(page),int(perPage))
-    
+
 @app.route('/recomandedCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['Post'])
 def getRecomandedCreations(page,perPage,uid):
     obj = CreationModel()
@@ -122,7 +132,7 @@ def removeFromCart():
 def getInCardCreations(uid):
     obj = CreationModel()
     return obj.getInCardCreation(uid)
-    
+
 # bank_account_controller.py
 @app.route('/add-bank-account', methods=['POST'])
 def add_bank_account():
@@ -140,17 +150,26 @@ def set_primary_account(user_id, account_id):
     obj = BackAcountModel()
     return obj.set_primary_account(user_id,account_id)
 
-# payment_controller.py
+# order_controller.py
 @app.route('/create-order', methods=['POST'])
 def create_order():
+    data = request.get_json()
     obj = OrderModel()
-    return obj.create_order()
+    return obj.create_order(data)
 
-    
+
 # file_controller.py
 @app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
 def getthumbnail(filename):
     return send_file(f"uploads/creation/thumbnail/{filename}")
+
+@app.route("/uploads/profilePick/<filename>",methods=['GET'])
+def getProfilePhoto(filename):
+    return send_file(f"uploads/profilePick/{filename}")
+
+@app.route("/uploads/categories/<filename>",methods=['GET'])
+def getCategories(filename):
+    return send_file(f"uploads/categories/{filename}")
 
 @app.route('/uploads/creation/sourcefile/<filename>', methods=['GET'])
 def download_file(filename):
@@ -162,10 +181,29 @@ def download_file(filename):
         return send_file(file_path, as_attachment=True)
     except Exception as e:
         return str(e), 404
-    
+
+# categories_controller.py
+@app.route('/categories/<uid>', methods=['GET'])
+def get_categories(uid):
+    category_Model = categoryModel()
+    try:
+        categories = category_Model.getCategories(1)  # Replace 1 with dynamic user ID if needed
+
+        if categories:
+            return jsonify({"status": "success", "data": categories}), 200  # HTTP 200 OK
+        else:
+            return jsonify({"status": "error", "message": "No categories found"}), 404  # HTTP 404 Not Found
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500  # HTTP 500 Internal Server Error
+
 # Import the controllers to register routes
-import controller.user_controller
-import controller.creation_controller
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

@@ -33,8 +33,8 @@ class CreationModel:
             
     def listCreationModel(self,data,filePaths):
         query = """
-        INSERT INTO creations (creation_title, creation_description, creation_price, creation_thumbnail, creation_file, category_id, keyword, creation_other_images, total_copy_sell, user_id, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO creations (creation_title, creation_description, creation_price, creation_thumbnail, creation_file, category_id, keyword, creation_other_images, total_copy_sell, user_id, status,youtube_link)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
         
         self.cur.execute(query, (
@@ -48,7 +48,8 @@ class CreationModel:
             data.get('creation_other_images', None),
             data.get('total_copy_sell', 0),
             data['user_id'],
-            data.get('status', 'underreview')
+            data.get('status', 'underreview'),
+            data['youtube_link']
         ))
         self.con.commit()
         responce = make_response({"message": "Creation added successfully"}, 200)

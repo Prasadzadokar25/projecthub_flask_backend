@@ -49,7 +49,7 @@ class CreationModel:
             data.get('total_copy_sell', 0),
             data['user_id'],
             data.get('status', 'underreview'),
-            data['youtube_link']
+            data['youtube_link'] if data['youtube_link'] != "" else None
         ))
         self.con.commit()
         responce = make_response({"message": "Creation added successfully"}, 200)

@@ -72,7 +72,7 @@ class ReelsModel :
             cursor.close()
             conn.close()
             if(reels):
-                return jsonify(reels)
+                return jsonify({"data":reels}),200
             return jsonify({"massage":"data not found"}),204
 
         except Exception as e:

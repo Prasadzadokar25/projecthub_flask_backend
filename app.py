@@ -3,6 +3,7 @@ from model.bank_account_model import BackAcountModel
 from model.category_model import categoryModel
 from model.order_medel import OrderModel
 from model.reels_model import ReelsModel
+from model.transactions_model import TransactionModel
 from model.user_model import UserModel
 from model.login_model import LoginModel
 from model.creation_model import CreationModel
@@ -204,6 +205,10 @@ def get_categories(uid):
 @app.route('/reels', methods=['GET'])
 def getReels():
     return ReelsModel().get_reels(request)
+
+@app.route('/transactions', methods=['GET'])
+def getTransactions():
+    return TransactionModel().fetchTransaction(int(request.args.get('user_id', 1)))
     
 
 

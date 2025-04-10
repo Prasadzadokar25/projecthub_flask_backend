@@ -43,37 +43,77 @@ class ReelsModel :
             cursor = self.cur
             
             query = """
-            SELECT 
-                c.*,
-                (SELECT COUNT(*) FROM creation_likes cl WHERE cl.creation_id = c.creation_id) AS like_count,
-                (SELECT COUNT(*) FROM creation_shares cs WHERE cs.creation_id = c.creation_id) AS share_count,
-                EXISTS (
-                    SELECT 1 FROM creation_likes cl 
-                    WHERE cl.creation_id = c.creation_id AND cl.user_id = %s
-                ) AS is_liked_by_user
-            FROM creations c
-            WHERE c.youtube_link != 'null'
-            ORDER BY RAND()
-            LIMIT %s OFFSET %s
-            """
+                    SELECT * FROM (
+                SELECT 
+                    c.*,
+                    (SELECT COUNT(*) FROM creation_likes cl WHERE cl.creation_id = c.creation_id) AS like_count,
+                    (SELECT COUNT(*) FROM creation_shares cs WHERE cs.creation_id = c.creation_id) AS share_count,
+                    EXISTS (
+                        SELECT 1 FROM creation_likes cl 
+                        WHERE cl.creation_id = c.creation_id AND cl.user_id = %s
+                    ) AS is_liked_by_user
+                FROM creations c
+                WHERE c.youtube_link IS NOT NULL
+                LIMIT %s OFFSET %s
+            ) AS subquery
+            ORDER BY RAND();
 
-            # query = """
-            # SELECT c.*, 
-            #     (SELECT COUNT(*) FROM creation_likes cl WHERE cl.creation_id = c.creation_id) AS like_count,
-            #     (SELECT COUNT(*) FROM creation_shares cs WHERE cs.creation_id = c.creation_id) AS share_count
-            # FROM creations c
-            # WHERE c.youtube_link != 'null'
-            # ORDER BY c.createtime DESC
-            # LIMIT %s OFFSET %s
-            # """
+            """
             cursor.execute(query, (user_id, limit, offset))
             reels = cursor.fetchall()
 
             cursor.close()
             conn.close()
-            if(reels):
-                return jsonify({"data":reels}),200
-            return jsonify({"massage":"data not found"}),204
+            return jsonify({"data":reels}),200
+            
 
         except Exception as e:
             return  jsonify({"massage":f"server error:{e} "}),400
+
+    from pymysql.err import IntegrityError
+
+    def addLike(self, data):
+        print(data)
+        query = """
+        INSERT INTO creation_likes (creation_id, user_id)
+        VALUES (%s, %s)
+        """
+        values = (
+            data['creation_id'],
+            data['user_id']
+        )
+
+        try:
+            self.cur.execute(query, values)
+            self.con.commit()
+            response = make_response({"message": "Like added successfully"}, 200)
+
+        except pymysql.IntegrityError as e:
+            self.con.rollback()
+
+            if "unique_user_creation_like" in str(e):
+                response = make_response({"message": "User has already liked this creation"}, 409)
+            else:
+                response = make_response({"message": "Database error", "error": str(e)}, 500)
+                
+
+        response.headers['Access-Control-Allow-Origin'] = "*"
+        return response
+
+        
+    def removeLike(self,data):
+        query = """
+        delete from creation_likes where creation_id = %s AND user_id = %s
+        """
+        
+        values = (
+            data['creation_id'],
+            data['user_id']
+            
+        )
+        
+        self.cur.execute(query, values)
+        self.con.commit()
+        responce = make_response({"message": "like removed sucessfuly"}, 200)
+        responce.headers['Access-Control-Allow-Origin'] = "*"
+        return responce

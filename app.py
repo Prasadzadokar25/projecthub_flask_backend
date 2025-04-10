@@ -206,9 +206,19 @@ def get_categories(uid):
 def getReels():
     return ReelsModel().get_reels(request)
 
+@app.route('/reel/addLike', methods=['POST'])
+def addLike():
+    return ReelsModel().addLike( request.get_json())
+
+@app.route('/reel/removeLike', methods=['POST'])
+def removeLike():
+    return ReelsModel().removeLike( request.get_json())
+
 @app.route('/transactions', methods=['GET'])
 def getTransactions():
     return TransactionModel().fetchTransaction(int(request.args.get('user_id', 1)))
+
+
     
 
 

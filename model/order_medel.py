@@ -39,7 +39,8 @@ class OrderModel:
     def create_order(self, data):
         user_id = data['user_id']
         payment_data = data['payment_details']  # This should be from the request body
-        products = data['product']  # List of products in the order
+        products = data['product'] 
+        date = data['order_date']# List of products in the order
         
         try:
             # Insert into `payments` table
@@ -62,9 +63,9 @@ class OrderModel:
 
             # Insert into `orders` table
             order_query = """
-                INSERT INTO orders (user_id, payment_id) VALUES (%s, %s)
+                INSERT INTO orders (user_id, payment_id,order_date) VALUES (%s, %s,%s)
             """
-            order_data = (user_id, payment_id)
+            order_data = (user_id, payment_id,date)
             self.cur.execute(order_query, order_data)
 
             # Get the `order_id` of the last inserted row

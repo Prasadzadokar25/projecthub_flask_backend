@@ -3,6 +3,8 @@ import json
 from pymysql.cursors import DictCursor
 from flask import make_response
 from flask import request, jsonify
+from pymysql.err import IntegrityError
+
 
 class ReelsModel :
     def __init__(self):
@@ -70,7 +72,6 @@ class ReelsModel :
         except Exception as e:
             return  jsonify({"massage":f"server error:{e} "}),400
 
-    from pymysql.err import IntegrityError
 
     def addLike(self, data):
         print(data)
@@ -117,3 +118,40 @@ class ReelsModel :
         responce = make_response({"message": "like removed sucessfuly"}, 200)
         responce.headers['Access-Control-Allow-Origin'] = "*"
         return responce
+    
+    def get_like_info(self, request):
+        limit = int(request.args.get('limit', 10))
+        offset = int(request.args.get('offset', 0))
+        reel_id = int(request.args.get('reel_id', 46))  # logged-in user
+        try:
+            conn = self.con
+            cursor = self.cur
+            
+            query = """
+                     SELECT 
+                     u.user_id,
+                    u.user_name,
+                    u.user_description,
+                    u.profile_photo
+                FROM 
+                    creation_likes cl
+                JOIN 
+                    users u ON cl.user_id = u.user_id
+                WHERE 
+                    cl.creation_id = %s
+                ORDER BY 
+                    cl.liked_at DESC
+                LIMIT %s OFFSET %s;
+
+
+            """
+            values = (reel_id,limit,offset)
+            cursor.execute(query,values)
+            likes = cursor.fetchall()
+
+            cursor.close()
+            conn.close()
+            return jsonify({"data":likes}),200
+        
+        except Exception as e:
+            return  jsonify({"massage":f"server error:{e} "}),400

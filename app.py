@@ -218,6 +218,10 @@ def removeLike():
 def getTransactions():
     return TransactionModel().fetchTransaction(int(request.args.get('user_id', 1)))
 
+@app.route('/reel/likes', methods=['GET'])
+def getLikeInfo():
+    return ReelsModel().get_like_info(request)
+
 
     
 

@@ -3,6 +3,7 @@ from model.bank_account_model import BackAcountModel
 from model.category_model import categoryModel
 from model.order_medel import OrderModel
 from model.reels_model import ReelsModel
+from model.search_model import SearchModel
 from model.transactions_model import TransactionModel
 from model.user_model import UserModel
 from model.login_model import LoginModel
@@ -221,6 +222,11 @@ def getTransactions():
 @app.route('/reel/likes', methods=['GET'])
 def getLikeInfo():
     return ReelsModel().get_like_info(request)
+
+@app.route('/search/creation', methods=['GET'])
+def getSearchedCreations():
+    return SearchModel().get_serched_Creations(request)
+
 
 
     

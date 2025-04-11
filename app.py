@@ -101,18 +101,18 @@ def purchedCreations(page,perPage,uid):
 @app.route('/creations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def getCreations(page,perPage,uid):
     obj = CreationModel()
-    return obj.getCreationsModel(int(page),int(perPage))
+    return obj.getCreationsModel(int(page),int(perPage),uid)
 
 @app.route('/recentCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def recentCreations(page,perPage,uid):
     obj = CreationModel()
-    return obj.getRecentlyAddedCreations(int(page),int(perPage))
+    return obj.getRecentlyAddedCreations(int(page),int(perPage),uid)
 
 
 @app.route('/trendingCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def trendingCreations(page,perPage,uid):
     obj = CreationModel()
-    return obj.getTrendingCreations(int(page),int(perPage))
+    return obj.getTrendingCreations(int(page),int(perPage),uid)
 
 @app.route('/recomandedCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['Post'])
 def getRecomandedCreations(page,perPage,uid):

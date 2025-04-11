@@ -101,8 +101,9 @@ class CreationModel:
             return make_response({"message": "Creation not found"}, 404)
 
 
-    def getCreationsModel(self,pageNo,perPage):
+    def getCreationsModel(self, pageNo, perPage, current_user_id):
         offset = (pageNo - 1) * perPage
+
         query = """
         SELECT 
             c.creation_id,
@@ -114,27 +115,40 @@ class CreationModel:
             c.category_id,
             c.keyword,
             c.createtime,
-
             c.creation_other_images,
             c.total_copy_sell,
+
             u.user_id AS seller_id,
             u.user_name AS seller_name,
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
+
             COALESCE(AVG(r.rating), 0) AS average_rating,
-            COUNT(r.rating_id) AS number_of_reviews
+            COUNT(r.rating_id) AS number_of_reviews,
+
+            -- Total like count
+            COUNT(DISTINCT cl.like_id) AS total_likes,
+
+            -- Is liked by current user (1 or 0)
+            MAX(CASE WHEN cl_user.user_id = %s THEN 1 ELSE 0 END) AS is_liked_by_user
+
         FROM 
             creations c
         JOIN 
             users u ON c.user_id = u.user_id
         LEFT JOIN 
             ratings r ON c.creation_id = r.creation_id
+        LEFT JOIN 
+            creation_likes cl ON c.creation_id = cl.creation_id
+        LEFT JOIN 
+            creation_likes cl_user ON c.creation_id = cl_user.creation_id AND cl_user.user_id = %s
+
         GROUP BY 
             c.creation_id, u.user_id
         LIMIT %s OFFSET %s;
         """
 
-        self.cur.execute(query, (perPage, offset))
+        self.cur.execute(query, (current_user_id, current_user_id, perPage, offset))
         results = self.cur.fetchall()
 
         creations = []
@@ -159,17 +173,20 @@ class CreationModel:
                 "average_rating": result["average_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
-
-                "seller":seller_data
+                "total_likes": result["total_likes"],
+                "isLikedByUser": bool(result["is_liked_by_user"]),
+                "seller": seller_data
             }
-            
-            creations.append(creation_data)
-        responce = make_response({"creations": creations, "page": pageNo, "limit": perPage}, 200)
-        responce.headers['Access-Control-Allow-Origin'] = "*"
 
-        return responce
+            creations.append(creation_data)
+
+        response = make_response({"creations": creations, "page": pageNo, "limit": perPage}, 200)
+        response.headers['Access-Control-Allow-Origin'] = "*"
+
+        return response
+
         
-    def getRecentlyAddedCreations(self,pageNo,perPage):
+    def getRecentlyAddedCreations(self, pageNo, perPage, current_user_id):
         offset = (pageNo - 1) * perPage
         query = """
         SELECT 
@@ -184,25 +201,37 @@ class CreationModel:
             c.keyword,
             c.creation_other_images,
             c.total_copy_sell,
+
             u.user_id AS seller_id,
             u.user_name AS seller_name,
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
+
             COALESCE(AVG(r.rating), 0) AS average_rating,
-            COUNT(r.rating_id) AS number_of_reviews
+            COUNT(r.rating_id) AS number_of_reviews,
+
+            COUNT(DISTINCT cl.like_id) AS total_likes,
+            MAX(CASE WHEN cl_user.user_id = %s THEN 1 ELSE 0 END) AS is_liked_by_user
+
         FROM 
             creations c
         JOIN 
             users u ON c.user_id = u.user_id
         LEFT JOIN 
             ratings r ON c.creation_id = r.creation_id
+        LEFT JOIN 
+            creation_likes cl ON c.creation_id = cl.creation_id
+        LEFT JOIN 
+            creation_likes cl_user ON c.creation_id = cl_user.creation_id AND cl_user.user_id = %s
+
         GROUP BY 
             c.creation_id, u.user_id
-        order by (createtime) desc
+        ORDER BY 
+            c.createtime DESC
         LIMIT %s OFFSET %s;
         """
 
-        self.cur.execute(query, (perPage, offset))
+        self.cur.execute(query, (current_user_id, current_user_id, perPage, offset))
         results = self.cur.fetchall()
 
         creations = []
@@ -227,16 +256,20 @@ class CreationModel:
                 "average_rating": result["average_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
-                "seller":seller_data
+                "total_likes": result["total_likes"],
+                "isLikedByUser": bool(result["is_liked_by_user"]),
+                "seller": seller_data
             }
             
             creations.append(creation_data)
+
         responce = make_response({"creations": creations, "page": pageNo, "limit": perPage}, 200)
         responce.headers['Access-Control-Allow-Origin'] = "*"
 
         return responce
+
     
-    def getTrendingCreations(self,pageNo,perPage):
+    def getTrendingCreations(self, pageNo, perPage, current_user_id):
         offset = (pageNo - 1) * perPage
         query = """
         SELECT 
@@ -251,25 +284,37 @@ class CreationModel:
             c.keyword,
             c.creation_other_images,
             c.total_copy_sell,
+
             u.user_id AS seller_id,
             u.user_name AS seller_name,
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
+
             COALESCE(AVG(r.rating), 0) AS average_rating,
-            COUNT(r.rating_id) AS number_of_reviews
+            COUNT(r.rating_id) AS number_of_reviews,
+
+            COUNT(DISTINCT cl.like_id) AS total_likes,
+            MAX(CASE WHEN cl_user.user_id = %s THEN 1 ELSE 0 END) AS is_liked_by_user
+
         FROM 
             creations c
         JOIN 
             users u ON c.user_id = u.user_id
         LEFT JOIN 
             ratings r ON c.creation_id = r.creation_id
+        LEFT JOIN 
+            creation_likes cl ON c.creation_id = cl.creation_id
+        LEFT JOIN 
+            creation_likes cl_user ON c.creation_id = cl_user.creation_id AND cl_user.user_id = %s
+
         GROUP BY 
             c.creation_id, u.user_id
-        order by (total_copy_sell) desc
+        ORDER BY 
+            c.total_copy_sell DESC
         LIMIT %s OFFSET %s;
         """
 
-        self.cur.execute(query, (perPage, offset))
+        self.cur.execute(query, (current_user_id, current_user_id, perPage, offset))
         results = self.cur.fetchall()
 
         creations = []
@@ -294,14 +339,18 @@ class CreationModel:
                 "average_rating": result["average_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
-                "seller":seller_data
+                "total_likes": result["total_likes"],
+                "isLikedByUser": bool(result["is_liked_by_user"]),
+                "seller": seller_data
             }
             
             creations.append(creation_data)
+
         responce = make_response({"creations": creations, "page": pageNo, "limit": perPage}, 200)
         responce.headers['Access-Control-Allow-Origin'] = "*"
 
         return responce
+
         
     def getUserListedCreations(self,user_id):
         query = f"select * from Creations where user_id = {user_id}"

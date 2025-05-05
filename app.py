@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from model.advertisement import AdvertisementModel
 from model.bank_account_model import BackAcountModel
 from model.category_model import categoryModel
 from model.order_medel import OrderModel
@@ -117,7 +118,7 @@ def trendingCreations(page,perPage,uid):
 @app.route('/recomandedCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['Post'])
 def getRecomandedCreations(page,perPage,uid):
     obj = CreationModel()
-    return obj.getTrendingCreations(int(page),int(perPage))
+    return obj.getTrendingCreations(int(page),int(perPage),uid)
 
 @app.route('/creation/card/add', methods=['POST'])
 def addCreationInUserCard():
@@ -174,6 +175,10 @@ def getProfilePhoto(filename):
 def getCategories(filename):
     return send_file(f"uploads/categories/{filename}")
 
+@app.route("/uploads/advertisements/ad_images/<filename>",methods=['GET'])
+def getAdImage(filename):
+    return send_file(f"uploads/advertisements/ad_images/{filename}")
+
 @app.route('/uploads/creation/sourcefile/<filename>', methods=['GET'])
 def download_file(filename):
     # Path to your ZIP file
@@ -227,13 +232,15 @@ def getLikeInfo():
 def getSearchedCreations():
     return SearchModel().get_serched_Creations(request)
 
+# advertisement_controller.py
+@app.route('/advertisements', methods=['GET'])
+def getAdvertisements():
+    return AdvertisementModel().get_advertisements_by_location(request.args.get('user_id', 1),request.args.get('location'))
 
 
-    
-
-
-
-
+@app.route('/advertisements/add', methods=['POST'])
+def addNewAdvertisment():
+    return AdvertisementModel().add_advertisement(request)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

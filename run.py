@@ -27,38 +27,6 @@ register_blueprint(app)
 def welcome():
     return "hello welcome to projecthub"
 
-# user_controller.py
-
-@app.route("/getUsers")
-def getUsers():
-    userobj = UserModel()
-    return userobj.getUsersModel()
-
-@app.route("/addUser",methods=["POST"])
-def addUser():
-    userobj = UserModel()
-    data = request.get_json()
-    return userobj.addUserModel(data)
-
-@app.route('/update_user/<int:user_id>', methods=['PATCH'])
-def updateUser(user_id):
-    userobj = UserModel()
-    data = request.form
-    files = request.files
-
-    return userobj.update_user(user_id,data,files)
-
-
-@app.route("/getUser/<id>")
-def getUserById(id):
-    userobj = UserModel()
-    return userobj.getUserByIdModel(id)
-
-@app.route("/checkNumber",methods=["POST"])
-def chechNumber():
-    userobj = UserModel()
-    data = request.get_json()
-    return userobj.checkNumberModel(data['user_contact'])
 
 @app.route("/checkLogin",methods=["POST"])
 def checkLogin():
@@ -142,22 +110,6 @@ def getInCardCreations(uid):
     obj = CreationModel()
     return obj.getInCardCreation(uid)
 
-# bank_account_controller.py
-@app.route('/add-bank-account', methods=['POST'])
-def add_bank_account():
-    data = request.get_json()
-    obj =BackAcountModel()
-    return obj.add_bank_account(data)
-
-@app.route('/accounts/<int:user_id>', methods=['GET'])
-def get_accounts_for_user(user_id):
-    obj =BackAcountModel()
-    return obj.get_accounts_for_user(user_id)
-
-@app.route('/set-primary-account/<int:user_id>/<int:account_id>', methods=['PUT'])
-def set_primary_account(user_id, account_id):
-    obj = BackAcountModel()
-    return obj.set_primary_account(user_id,account_id)
 
 # order_controller.py
 @app.route('/create-order', methods=['POST'])

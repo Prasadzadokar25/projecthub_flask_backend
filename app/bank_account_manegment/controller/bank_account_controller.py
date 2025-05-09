@@ -57,6 +57,7 @@ class BackAcountController:
         try:
             # Connect to the database
             connection = get_db_connection()
+            print(user_id)
            
             with connection.cursor() as cursor:
                 # Query to fetch all accounts for the given user_id

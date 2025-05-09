@@ -1,6 +1,6 @@
 
 from flask import Blueprint, request
-from app.creation.controller.purchesed_creation_controller import PurchasedCreationController
+from app.creation_manegement.controller.purchesed_creation_controller import PurchasedCreationController
 
 
 creation_bp = Blueprint('creation', __name__, url_prefix='/creation')

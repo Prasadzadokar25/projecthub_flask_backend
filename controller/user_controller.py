@@ -1,4 +1,4 @@
-from app import app
+from run import app
 from model.user_model import UserModel
 from flask import request,send_file
 from datetime import datetime

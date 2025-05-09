@@ -96,11 +96,15 @@ class SearchModel:
                 LIMIT %s OFFSET %s;
             """
 
-            cursor.execute(query, (
-                search, search, search, search, search,search,
-                search, search, search, search, search,
-                limit, offset
-            ))
+            try:
+                cursor.execute(query, (
+                    search, search, search, search, search, search,
+                    search, search, search, search, search,
+                    limit, offset
+                ))
+            finally:
+                cursor.close()
+                conn.close()
 
             rows = cursor.fetchall()
             result_list = []

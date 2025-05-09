@@ -1,12 +1,10 @@
 from flask import Flask, jsonify
 from model.advertisement import AdvertisementModel
-from model.bank_account_model import BackAcountModel
 from model.category_model import categoryModel
 from model.order_medel import OrderModel
 from model.reels_model import ReelsModel
 from model.search_model import SearchModel
 from model.transactions_model import TransactionModel
-from model.user_model import UserModel
 from model.login_model import LoginModel
 from model.creation_model import CreationModel
 from flask import request,send_file

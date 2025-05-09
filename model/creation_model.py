@@ -67,7 +67,7 @@ class CreationModel:
             c.creation_file, 
             cat.category_name, 
             cat.category_description, 
-            COALESCE(AVG(r.rating), 0) AS average_rating
+            COALESCE(AVG(r.rating), 0) AS avg_rating
         FROM 
             creations c
         INNER JOIN 
@@ -94,7 +94,7 @@ class CreationModel:
                 "creation_file": creation_details[5],
                 "category_name": creation_details[6],
                 "category_description": creation_details[7],
-                "average_rating": creation_details[8]
+                "avg_rating": creation_details[8]
             }
             return make_response(result, 200)
         else:
@@ -123,7 +123,7 @@ class CreationModel:
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
 
-            COALESCE(AVG(r.rating), 0) AS average_rating,
+            COALESCE(AVG(r.rating), 0) AS avg_rating,
             COUNT(r.rating_id) AS number_of_reviews,
 
             -- Total like count
@@ -170,7 +170,7 @@ class CreationModel:
                 "keyword": result["keyword"],
                 "creation_other_images": result["creation_other_images"],
                 "total_copy_sell": result["total_copy_sell"],
-                "average_rating": result["average_rating"],
+                "avg_rating": result["avg_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
                 "total_likes": result["total_likes"],
@@ -207,7 +207,7 @@ class CreationModel:
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
 
-            COALESCE(AVG(r.rating), 0) AS average_rating,
+            COALESCE(AVG(r.rating), 0) AS avg_rating,
             COUNT(r.rating_id) AS number_of_reviews,
 
             COUNT(DISTINCT cl.like_id) AS total_likes,
@@ -253,7 +253,7 @@ class CreationModel:
                 "keyword": result["keyword"],
                 "creation_other_images": result["creation_other_images"],
                 "total_copy_sell": result["total_copy_sell"],
-                "average_rating": result["average_rating"],
+                "avg_rating": result["avg_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
                 "total_likes": result["total_likes"],
@@ -290,7 +290,7 @@ class CreationModel:
             u.user_email AS seller_email,
             u.profile_photo AS seller_profile_photo,
 
-            COALESCE(AVG(r.rating), 0) AS average_rating,
+            COALESCE(AVG(r.rating), 0) AS avg_rating,
             COUNT(r.rating_id) AS number_of_reviews,
 
             COUNT(DISTINCT cl.like_id) AS total_likes,
@@ -336,7 +336,7 @@ class CreationModel:
                 "keyword": result["keyword"],
                 "creation_other_images": result["creation_other_images"],
                 "total_copy_sell": result["total_copy_sell"],
-                "average_rating": result["average_rating"],
+                "avg_rating": result["avg_rating"],
                 "number_of_reviews": result["number_of_reviews"],
                 "createtime": result["createtime"],
                 "total_likes": result["total_likes"],
@@ -461,7 +461,7 @@ class CreationModel:
             'total_copy_sell', c.total_copy_sell,
             'gst_percentage', g.gst_percentage,
             'platform_fee_percentage', p.fee_percentage,
-            'average_rating',ROUND(IFNULL(
+            'avg_rating',ROUND(IFNULL(
             (SELECT AVG(r.rating) 
              FROM ratings r 
              WHERE r.creation_id = c.creation_id), 0

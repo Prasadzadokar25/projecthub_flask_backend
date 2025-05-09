@@ -66,7 +66,7 @@ class SearchModel:
                     u.user_email AS seller_email,
                     u.profile_photo AS seller_profile_photo,
 
-                    COALESCE(AVG(r.rating), 0) AS average_rating,
+                    COALESCE(AVG(r.rating), 0) AS avg_rating,
                     COUNT(r.rating_id) AS number_of_reviews,
 
                     (
@@ -111,7 +111,7 @@ class SearchModel:
 
             for row in rows:
                 result_list.append({
-                    "average_rating": float(row["average_rating"]),
+                    "avg_rating": float(row["avg_rating"]),
                     "category_id": row["category_id"],
                     "createtime": row["createtime"].strftime('%a, %d %b %Y %H:%M:%S GMT'),
                     "creation_description": row["creation_description"],

@@ -3,10 +3,14 @@ import os
 import uuid
 from flask import Blueprint, request
 from app.creation_manegement.controller.purchesed_creation_controller import PurchasedCreationController
+from app.creation_manegement.controller.recently_added_creation_controller import RecentlyAddedCreationController
 from app.creation_manegement.controller.user_listed_creation_controller import UserListedCreationController
 
 
 creation_bp = Blueprint('creation', __name__, url_prefix='/creation')
+
+
+# user listed creation routes
 
 @creation_bp.route("/userListedCreations/<user_id>",methods=['GET'])
 def userListedCreations(user_id):
@@ -40,6 +44,7 @@ def listCreation():
     return obj.listCreationModel(data,filePaths)
 
 
+# purchesed creation routes
 @creation_bp.route('/purchesed', methods=['GET'])
 def get_purchesed_creations():
         user_id = request.args.get('user_id')
@@ -53,3 +58,8 @@ def get_purchesed_creation_details():
         purchasedCreationController = PurchasedCreationController()
         return purchasedCreationController.get_purchased_creation_details(user_id,creation_id)
 
+
+@creation_bp.route('/recentCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def recentCreations(page,perPage,uid):
+    obj = RecentlyAddedCreationController()
+    return obj.getRecentlyAddedCreations(int(page),int(perPage),uid)

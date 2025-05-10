@@ -163,88 +163,7 @@ class CreationModel:
         return response
 
         
-    def getRecentlyAddedCreations(self, pageNo, perPage, current_user_id):
-        offset = (pageNo - 1) * perPage
-        query = """
-        SELECT 
-            c.creation_id,
-            c.creation_title,
-            c.creation_description,
-            c.creation_price,
-            c.creation_thumbnail,
-            c.creation_file,
-            c.category_id,
-            c.createtime,
-            c.keyword,
-            c.creation_other_images,
-            c.total_copy_sell,
-
-            u.user_id AS seller_id,
-            u.user_name AS seller_name,
-            u.user_email AS seller_email,
-            u.profile_photo AS seller_profile_photo,
-
-            COALESCE(AVG(r.rating), 0) AS avg_rating,
-            COUNT(r.rating_id) AS number_of_reviews,
-
-            COUNT(DISTINCT cl.like_id) AS total_likes,
-            MAX(CASE WHEN cl_user.user_id = %s THEN 1 ELSE 0 END) AS is_liked_by_user
-
-        FROM 
-            creations c
-        JOIN 
-            users u ON c.user_id = u.user_id
-        LEFT JOIN 
-            ratings r ON c.creation_id = r.creation_id
-        LEFT JOIN 
-            creation_likes cl ON c.creation_id = cl.creation_id
-        LEFT JOIN 
-            creation_likes cl_user ON c.creation_id = cl_user.creation_id AND cl_user.user_id = %s
-
-        GROUP BY 
-            c.creation_id, u.user_id
-        ORDER BY 
-            c.createtime DESC
-        LIMIT %s OFFSET %s;
-        """
-
-        self.cur.execute(query, (current_user_id, current_user_id, perPage, offset))
-        results = self.cur.fetchall()
-
-        creations = []
-        for result in results:
-            seller_data = {
-                "seller_id": result["seller_id"],
-                "seller_name": result["seller_name"],
-                "seller_email": result["seller_email"],
-                "seller_profile_photo": result["seller_profile_photo"]
-            }
-            creation_data = {
-                "creation_id": result["creation_id"],
-                "creation_title": result["creation_title"],
-                "creation_description": result["creation_description"],
-                "creation_price": result["creation_price"],
-                "creation_thumbnail": result["creation_thumbnail"],
-                "creation_file": result["creation_file"],
-                "category_id": result["category_id"],
-                "keyword": result["keyword"],
-                "creation_other_images": result["creation_other_images"],
-                "total_copy_sell": result["total_copy_sell"],
-                "avg_rating": result["avg_rating"],
-                "number_of_reviews": result["number_of_reviews"],
-                "createtime": result["createtime"],
-                "total_likes": result["total_likes"],
-                "isLikedByUser": bool(result["is_liked_by_user"]),
-                "seller": seller_data
-            }
-            
-            creations.append(creation_data)
-
-        responce = make_response({"creations": creations, "page": pageNo, "limit": perPage}, 200)
-        responce.headers['Access-Control-Allow-Origin'] = "*"
-
-        return responce
-
+    
     
     def getTrendingCreations(self, pageNo, perPage, current_user_id):
         offset = (pageNo - 1) * perPage
@@ -333,50 +252,7 @@ class CreationModel:
         
         
             
-    def getPurchedCreations(self,pageNo,perPage,uid):
-        print("pppppppppppppppppppppppp")
-
-        offset = (pageNo - 1) * perPage
-        query = """
-        SELECT 
-            JSON_OBJECT(
-                'order_id', o.order_id,
-                'order_date', o.order_date,
-                'purchase_price', od.price,
-                'creation', JSON_OBJECT(
-                    'creation_id', c.creation_id,
-                    'creation_title', c.creation_title,
-                    'creation_description', c.creation_description,
-                    'creation_thumbnail', c.creation_thumbnail,
-                    'creation_file', c.creation_file,
-                    'category_id', c.category_id,
-                    'creation_other_images', c.creation_other_images,
-                    'total_copy_sell', c.total_copy_sell
-                )
-            ) AS creation_details
-        FROM 
-            orders o
-        JOIN 
-            order_details od ON o.order_id = od.order_id
-        JOIN 
-            creations c ON od.creation_id = c.creation_id
-        WHERE 
-            o.user_id = %s
-        """
-        # LIMIT %s OFFSET %s; //update
-
-        self.cur.execute(query, (uid)) #,perPage,offset  # update
-        result = self.cur.fetchall()
-        responce = make_response({"data": result, "page": pageNo, "limit": perPage}, 200)
-        responce.headers['Access-Control-Allow-Origin'] = "*"
-        try:
-            pass
-            
-        except:
-            responce = make_response({"error": "Internal server error"}, 400)
-            responce.headers['Access-Control-Allow-Origin'] = "*"
-
-        return responce
+    
         
     def addCreationInUserCard(self,data):
         print( data['userId'],

@@ -4,6 +4,7 @@ import uuid
 from flask import Blueprint, request
 from app.creation_manegement.controller.purchesed_creation_controller import PurchasedCreationController
 from app.creation_manegement.controller.recently_added_creation_controller import RecentlyAddedCreationController
+from app.creation_manegement.controller.trending_creation_controller import TrendingCreationController
 from app.creation_manegement.controller.user_listed_creation_controller import UserListedCreationController
 
 
@@ -59,7 +60,15 @@ def get_purchesed_creation_details():
         return purchasedCreationController.get_purchased_creation_details(user_id,creation_id)
 
 
+
+#recently added creation routes
 @creation_bp.route('/recentCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def recentCreations(page,perPage,uid):
     obj = RecentlyAddedCreationController()
     return obj.getRecentlyAddedCreations(int(page),int(perPage),uid)
+
+# trending creation routes
+@creation_bp.route('/trendingCreations/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
+def trendingCreations(page,perPage,uid):
+    obj = TrendingCreationController()
+    return obj.getTrendingCreations(int(page),int(perPage),uid)

@@ -34,36 +34,7 @@ def checkLogin():
 
 # creation_controller.py
 
-@app.route("/listCreation",methods=['POST'])
-def listCreation():
-    if 'creation_thumbnail' not in request.files or 'creation_file' not in request.files:
-        return "No file part", 400
-    obj = CreationModel()
-    base_path_scorcFile = 'uploads/creation/sourcefile/'
-    base_path_thumbnail = 'uploads/creation/thumbnail/'
-    print("here1")
-    data = request.form
-    files = request.files
-    creation_file = files['creation_file']
-    creation_thumbnail = files['creation_thumbnail']
-    print("here1")
-    # Generate unique filenames
-    unique_filename = str(uuid.uuid4()) + os.path.splitext(creation_file.filename)[1]
-    unique_thumbnail = str(uuid.uuid4()) + os.path.splitext(creation_thumbnail.filename)[1]
 
-    creation_file.save(base_path_scorcFile+unique_filename)
-    creation_thumbnail.save(base_path_thumbnail+unique_thumbnail)
-
-    filePaths = {
-        "souce_file":base_path_scorcFile+unique_filename,
-        "thumbnail":base_path_thumbnail+unique_thumbnail
-    }
-    return obj.listCreationModel(data,filePaths)
-
-@app.route("/userListedCreations/<user_id>",methods=['GET'])
-def userListedCreations(user_id):
-    obj = CreationModel()
-    return obj.getUserListedCreations(user_id)
 
 @app.route('/creation/purched/page/<page>/perPage/<perPage>/uid/<uid>', methods=['GET'])
 def purchedCreations(page,perPage,uid):
@@ -118,7 +89,7 @@ def create_order():
 
 
 # file_controller.py
-@app.route("/uploads/creation/thumbnail/<filename>",methods=['GET'])
+@app.route("/app/uploads/creation/thumbnail/<filename>",methods=['GET'])
 def getthumbnail(filename):
     return send_file(f"app/uploads/creation/thumbnail/{filename}")
 
@@ -135,10 +106,10 @@ def getAdImage(filename):
     return send_file(f"app/uploads/advertisements/ad_images/{filename}")
 
 
-@app.route('/uploads/creation/sourcefile/<filename>', methods=['GET'])
+@app.route('/app/uploads/creation/sourcefile/<filename>', methods=['GET'])
 def download_file(filename):
     # Path to your ZIP file
-    file_path = f'app/uploads/creation/sourcefile/{filename}'
+    file_path = f'uploads/creation/sourcefile/{filename}'
 
     try:
         # Send the file to the client

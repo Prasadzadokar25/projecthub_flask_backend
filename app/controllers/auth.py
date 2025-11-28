@@ -1,0 +1,33 @@
+from flask import Blueprint, request, make_response
+from model.login_model import LoginModel
+from app.auth import generate_jwt
+
+auth_bp = Blueprint('auth', __name__)
+
+
+@auth_bp.route('/checkLogin', methods=['POST'])
+def check_login():
+    """Authenticate user and return a JWT token on success.
+
+    This wraps the existing LoginModel.checkLoginDetailsModel call and appends
+    a `token` field to the successful response body.
+    """
+    userobj = LoginModel()
+    data = request.get_json()
+    # call existing login logic which returns a Flask response
+    res = userobj.checkLoginDetailsModel(data)
+    try:
+        if getattr(res, 'status_code', None) == 200:
+            body = res.get_json()
+            # Expecting body['data'] to be a list with the user record
+            user_id = None
+            if body and isinstance(body, dict) and 'data' in body and isinstance(body['data'], list) and len(body['data']) > 0:
+                user_id = body['data'][0].get('user_id')
+            if user_id is not None:
+                token = generate_jwt(user_id)
+                body['token'] = token
+            return make_response(body, 200)
+    except Exception:
+        # fall back to original response when something unexpected happens
+        pass
+    return res

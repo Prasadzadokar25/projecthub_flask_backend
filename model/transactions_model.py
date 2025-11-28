@@ -1,35 +1,13 @@
-import pymysql
 import json
-from pymysql.cursors import DictCursor
 from flask import make_response
 from flask import request, jsonify
+from model.db import get_db_connection
+
 class TransactionModel:
     def __init__(self):
-        
-        # local server
-        host = "localhost"
-        user = "root"
-        password = "##Prasad25"
-        database = "projecthubdb"
-        
-        # # pythonanywhere server 
-        # host = "projecthub.mysql.pythonanywhere-services.com"
-        # user = "projecthub"
-        # password = "##Prasad25"
-        # database = "projecthub$projecthubdb"
-        try:
-            self.con = pymysql.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
-                cursorclass=DictCursor
-            )
-            self.con.autocommit = True
-            self.cur = self.con.cursor()
-            print("connect succefuly")
-        except pymysql.MySQLError as err:
-            print(f"Failed to connect: {err}")
+        """Initialize TransactionModel with a centralized database connection."""
+        self.con = get_db_connection()
+        self.cur = self.con.cursor()
             
     def fetchTransaction(self,user_id):
         try:

@@ -1,43 +1,26 @@
-import pymysql
 import json
-from pymysql.cursors import DictCursor
 from flask import make_response
 from flask import request, jsonify
 from pymysql.err import IntegrityError
+import pymysql
+from model.db import get_db_connection
 
 
-class ReelsModel :
+class ReelsModel:
     def __init__(self):
-        
-        # local server
-        host = "localhost"
-        user = "root"
-        password = "##Prasad25"
-        database = "projecthubdb"
-        
-        # # pythonanywhere server 
-        # host = "projecthub.mysql.pythonanywhere-services.com"
-        # user = "projecthub"
-        # password = "##Prasad25"
-        # database = "projecthub$projecthubdb"
-        try:
-            self.con = pymysql.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
-                cursorclass=DictCursor
-            )
-            self.con.autocommit = True
-            self.cur = self.con.cursor()
-            print("connect succefuly")
-        except pymysql.MySQLError as err:
-            print(f"Failed to connect: {err}")
+        """Initialize ReelsModel with a centralized database connection."""
+        self.con = get_db_connection()
+        self.cur = self.con.cursor()
 
-    def get_reels(self, request):
-        limit = int(request.args.get('limit', 5))
-        offset = int(request.args.get('offset', 0))
-        user_id = int(request.args.get('user_id', 46))  # logged-in user
+    def get_reels(self, request=None, user_id_override=None):
+        # request: optional Flask request (kept for backward compatibility)
+        # user_id_override: optional int provided by the controller (preferred)
+        limit = int(request.args.get('limit', 5)) if request else 5
+        offset = int(request.args.get('offset', 0)) if request else 0
+        if user_id_override is not None:
+            user_id = int(user_id_override)
+        else:
+            user_id = int(request.args.get('user_id', 46)) if request else 46  # fallback
 
         
         try:
@@ -119,10 +102,10 @@ class ReelsModel :
         responce.headers['Access-Control-Allow-Origin'] = "*"
         return responce
     
-    def get_like_info(self, request):
-        limit = int(request.args.get('limit', 10))
-        offset = int(request.args.get('offset', 0))
-        reel_id = int(request.args.get('reel_id', 46))  # logged-in user
+    def get_like_info(self, request=None, user_id_override=None):
+        limit = int(request.args.get('limit', 10)) if request else 10
+        offset = int(request.args.get('offset', 0)) if request else 0
+        reel_id = int(request.args.get('reel_id', 46)) if request else 46
         try:
             conn = self.con
             cursor = self.cur

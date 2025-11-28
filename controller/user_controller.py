@@ -42,6 +42,12 @@ def uploadUserAvatar(id):
 
 @app.route("/getFile/<filename>")
 def getfile(filename):
+    """
+    Return a file from the upload directory
+
+    :param filename: The name of the file to return
+    :return: The file with the given filename
+    """
     return send_file(f"upload/{filename}")
     
 

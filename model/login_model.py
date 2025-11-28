@@ -1,43 +1,37 @@
-import pymysql
 import json
-from pymysql.cursors import DictCursor
 from flask import make_response
 from flask import request, jsonify
 import random
 import string
 import time
+from model.db import get_db_connection, close_db_connection
+
 
 class LoginModel:
     def __init__(self):
-        
-        # local server
-        host = "localhost"
-        user = "root"
-        password = "##Prasad25"
-        database = "projecthubdb"
-        
-        # # pythonanywhere server 
-        # host = "projecthub.mysql.pythonanywhere-services.com"
-        # user = "projecthub"
-        # password = "##Prasad25"
-        # database = "projecthub$projecthubdb"
-        try:
-            self.con = pymysql.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
-                cursorclass=DictCursor
-            )
-            self.con.autocommit = True
-            self.cur = self.con.cursor()
-            print("connect succefuly")
-        except pymysql.MySQLError as err:
-            print(f"Failed to connect: {err}")
+        """Initialize LoginModel with a centralized database connection."""
+        self.con = get_db_connection()
+        self.cur = self.con.cursor()
     
     def checkLoginDetailsModel(self,data):
+        
+        print(data)
+        
+        if 'user_key' not in data or 'user_password' not in data:
+            res = {'status':'False','message': "Username and password are required."}
+            res = make_response(res, 400)
+            res.headers['Access-Control-Allow-Origin']="*"
+            return res
+        
+        if not data['user_key'] or not data['user_password']:
+            res = {'status':'False','message': "Username and password cannot be empty."}
+            res = make_response(res, 400)
+            res.headers['Access-Control-Allow-Origin']="*"
+            return res
+        
         user_key = data['user_key']
         password = data['user_password']
+        
         query = f"""SELECT 
     u.user_id,
     u.user_name,

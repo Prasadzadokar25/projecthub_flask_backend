@@ -7,7 +7,7 @@ import random
 import string
 import time
 
-from app.database_connection.db_connection import get_db_connection
+from model.db import get_db_connection
 
 class UserController:
     

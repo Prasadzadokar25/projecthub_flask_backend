@@ -1,6 +1,6 @@
-from app.creation_manegement.roughts.roughts import creation_bp
-from app.bank_account_manegment.roughts.roughts import bank_account_bp
-from app.user_manegment.roughts.roughts import user_bp
+from app.controllers.creation import creation_bp
+from app.controllers.bank_account import bank_account_bp
+from app.controllers.user import user_bp
 from app.controllers.auth import auth_bp
 
 def register_blueprint(app):

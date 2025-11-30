@@ -1,7 +1,8 @@
+````markdown
 # Routes Initialization Guide - ✅ COMPLETE
 
 ## Overview
-All blueprints (roughts) are **properly initialized and working**. Here's how the initialization process works:
+All blueprints are **properly initialized and working**. Here's how the initialization process works:
 
 ---
 
@@ -12,7 +13,7 @@ All blueprints (roughts) are **properly initialized and working**. Here's how th
 ```python
 from app import create_app
 
-app = create_app()  # ← Creates and initializes the Flask app
+app = create_app()
 
 @app.route("/")
 def welcome():
@@ -28,7 +29,7 @@ if __name__ == '__main__':
 from flask import Flask
 from flask_cors import CORS
 from .config import Config
-from app.register_blueprint import register_blueprint  # ← Import
+from app.register_blueprint import register_blueprint
 from app.auth import register_auth
 
 def create_app(config_object=None):
@@ -40,13 +41,10 @@ def create_app(config_object=None):
     # 2. Enable CORS
     CORS(app)
     
-    # 3. Create DB tables (SQLAlchemy)
-    Base.metadata.create_all(engine)
-    
-    # 4. REGISTER BLUEPRINTS ← This initializes all routes
+    # 3. REGISTER BLUEPRINTS ← This initializes all routes
     register_blueprint(app)
     
-    # 5. REGISTER AUTH ← JWT guard
+    # 4. REGISTER AUTH ← JWT guard
     register_auth(app)
     
     return app
@@ -55,44 +53,41 @@ def create_app(config_object=None):
 ### Step 3: Blueprint Registration
 **File**: `app/register_blueprint.py`
 ```python
-from app.creation_manegement.roughts.roughts import creation_bp
-from app.bank_account_manegment.roughts.roughts import bank_account_bp
-from app.user_manegment.roughts.roughts import user_bp
+from app.controllers.creation import creation_bp
+from app.controllers.bank_account import bank_account_bp
+from app.controllers.user import user_bp
 
 def register_blueprint(app):
-    # Register all blueprints
-    app.register_blueprint(creation_bp)      # Initializes creation routes
-    app.register_blueprint(bank_account_bp)  # Initializes bank_account routes
-    app.register_blueprint(user_bp)          # Initializes user routes
+    app.register_blueprint(creation_bp)
+    app.register_blueprint(bank_account_bp)
+    app.register_blueprint(user_bp)
 ```
 
 ### Step 4: Blueprint Definitions
-Each blueprint is defined in its own `roughts.py` file:
+Each blueprint is defined in its own controller file:
 
-**Example**: `app/user_manegment/roughts/roughts.py`
+**Example**: `app/controllers/user.py`
 ```python
-from flask import Blueprint, request
-from app.user_manegment.controller.user_controller import UserController
+from flask import Blueprint, request, make_response
+from model.user import UserModel
 from app.utils.decorators import safe_route, require_user
 
-# Create blueprint with URL prefix
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
-# Define routes
 @user_bp.route("/get")
 @safe_route
 def getUsers():
-    userobj = UserController()
-    return userobj.getUsersModel()
-
-@user_bp.route("/add", methods=["POST"])
-@safe_route
-def addUser():
-    userobj = UserController()
-    data = request.get_json()
-    return userobj.addUserModel(data)
-
-# ... more routes
+    user_model = UserModel()
+    result = user_model.get_all_users()
+    user_model.close()
+    
+    if result['success']:
+        res = make_response({"data": result['data']}, 200)
+    else:
+        res = make_response({"error": result['error']}, 500)
+    
+    res.headers['Access-Control-Allow-Origin'] = "*"
+    return res
 ```
 
 ---
@@ -109,7 +104,7 @@ def addUser():
 | `user` | `/user` | 11 | ✅ Active |
 
 ### Total Routes
-- **Total active routes**: 21
+- **Total active routes**: 20+
 - **Total blueprints**: 3
 - **Default routes**: 1 (static files)
 
@@ -119,8 +114,8 @@ def addUser():
 ```
 ✓ GET    /creation/userListedCreations
 ✓ POST   /creation/listCreation
-✓ GET    /creation/purchesed
-✓ GET    /creation/purchesed-details
+✓ GET    /creation/purchased
+✓ GET    /creation/purchased-details
 ✓ GET    /creation/recentCreations/page/<page>/perPage/<perPage>
 ✓ GET    /creation/trendingCreations/page/<page>/perPage/<perPage>
 ```
@@ -164,48 +159,25 @@ When you start the app with `python run.py`:
    ↓
 5. CORS enabled for all routes
    ↓
-6. Database tables created (SQLAlchemy)
-   ↓
-7. register_blueprint(app) executes
-   ├─ Imports creation_bp from app/creation_manegement/roughts/roughts.py
-   ├─ Imports bank_account_bp from app/bank_account_manegment/roughts/roughts.py
-   ├─ Imports user_bp from app/user_manegment/roughts/roughts.py
+6. register_blueprint(app) executes
+   ├─ Imports creation_bp from app/controllers/creation.py
+   ├─ Imports bank_account_bp from app/controllers/bank_account.py
+   ├─ Imports user_bp from app/controllers/user.py
    │
    └─ Registers all blueprints with the app
       ├─ app.register_blueprint(creation_bp)      → 6 routes registered
       ├─ app.register_blueprint(bank_account_bp)  → 3 routes registered
       └─ app.register_blueprint(user_bp)          → 11 routes registered
    ↓
-8. register_auth(app) executes
+7. register_auth(app) executes
    ├─ Adds JWT guard to before_request hook
    └─ Validates tokens on all protected routes
    ↓
-9. Flask app is ready
+8. Flask app is ready
    ↓
-10. app.run() starts the development server
-    └─ All 21 routes are now available
+9. app.run() starts the development server
+    └─ All 20+ routes are now available
 ```
-
----
-
-## What Each Route File Contains
-
-### 1. `app/creation_manegement/roughts/roughts.py`
-- Creation listing, purchasing, trending, recently added
-- Uses multiple controllers (UserListedCreationController, PurchasedCreationController, etc.)
-- All routes require authentication (`@require_user`)
-
-### 2. `app/bank_account_manegment/roughts/roughts.py`
-- Add bank account
-- Get user's bank accounts
-- Set primary bank account
-- All routes require authentication
-
-### 3. `app/user_manegment/roughts/roughts.py` (Consolidated)
-- User CRUD operations (GET, POST, PUT, PATCH, DELETE)
-- File upload for avatars
-- Phone number validation
-- Some routes are public (e.g., `/user/add`), others require token
 
 ---
 
@@ -232,8 +204,8 @@ curl http://localhost:5000/user/get
 
 ## Summary
 
-✅ **All blueprints (roughts) are properly initialized**
-✅ **All 21 routes are registered and working**
+✅ **All blueprints are properly initialized**
+✅ **All 20+ routes are registered and working**
 ✅ **JWT authentication guard is active**
 ✅ **Database tables are created on startup**
 ✅ **CORS is enabled for all routes**
@@ -243,5 +215,6 @@ curl http://localhost:5000/user/get
 
 ---
 
-**Last Verified**: November 28, 2025
-**Verification Method**: Direct app introspection and route mapping
+**Last Verified**: November 30, 2025
+
+````

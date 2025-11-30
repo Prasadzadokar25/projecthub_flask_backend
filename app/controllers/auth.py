@@ -14,6 +14,16 @@ def check_login():
     """
     userobj = LoginModel()
     data = request.get_json()
+    # If client sends country_code + phone_number, combine them into user_key
+    try:
+        if data and isinstance(data, dict):
+            cc = data.get('country_code')
+            pn = data.get('phone_number')
+            if cc and pn and not data.get('user_key'):
+                data['user_key'] = f"+{str(cc).lstrip('+')}{pn}"
+    except Exception:
+        pass
+
     # call existing login logic which returns a Flask response
     res = userobj.checkLoginDetailsModel(data)
     try:

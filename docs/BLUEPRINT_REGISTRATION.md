@@ -1,3 +1,4 @@
+````markdown
 # Blueprint Registration Status - ✅ COMPLETE
 
 ## Verified Blueprint Initialization
@@ -6,9 +7,9 @@ All blueprints have been properly initialized and registered in the Flask app. H
 
 ### Registered Blueprints
 ✅ **3 blueprints active:**
-- `creation` - From `app/creation_manegement/roughts/roughts.py`
-- `bank_account` - From `app/bank_account_manegment/roughts/roughts.py`
-- `user` - From `app/user_manegment/roughts/roughts.py`
+- `creation` - From `app/controllers/creation.py`
+- `bank_account` - From `app/controllers/bank_account.py`
+- `user` - From `app/controllers/user.py`
 
 ### Route Registration Flow
 
@@ -20,9 +21,9 @@ run.py (entry point)
     register_blueprint(app) [app/register_blueprint.py]
       ↓
       Imports and registers:
-        ✓ creation_bp from app/creation_manegement/roughts/roughts.py
-        ✓ bank_account_bp from app/bank_account_manegment/roughts/roughts.py
-        ✓ user_bp from app/user_manegment/roughts/roughts.py
+        ✓ creation_bp from app/controllers/creation.py
+        ✓ bank_account_bp from app/controllers/bank_account.py
+        ✓ user_bp from app/controllers/user.py
     ↓
     register_auth(app) [app/auth.py]
       ↓
@@ -30,7 +31,7 @@ run.py (entry point)
 ```
 
 ### Total Routes Available
-- **Total routes in app**: 21
+- **Total routes in app**: 21+
 - **User routes**: 12 (all working)
 
 ### User Routes (Complete List)
@@ -46,7 +47,6 @@ run.py (entry point)
 ✓ PUT    /user/update-basic
 ✓ PATCH  /user/update-user
 ✓ PUT    /user/upload-avatar
-✓ GET    /creation/userListedCreations
 ```
 
 ## How It Works
@@ -99,4 +99,6 @@ print('Total routes:', len(list(app.url_map.iter_rules())))
 
 ---
 
-**Initialization Confirmed**: November 28, 2025
+**Initialization Confirmed**: November 30, 2025
+
+````

@@ -7,4 +7,13 @@ class Config:
     # Database URL (SQLAlchemy style). Override with env var in production.
     DATABASE_URL = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:##Prasad25@localhost/projecthubdb')
     # Public paths that don't require authentication
-    PUBLIC_PATHS = ['/', '/checkLogin','/users/checkNumber','/users/create']
+    PUBLIC_PATHS = [
+    '/checkLogin',
+    '/users/checkNumber',
+    '/users/create',
+
+    # Dynamic URL prefixes (correct)
+    '/uploads/categories/',
+    '/uploads/advertisements/ad_images/',
+    '/files/uploads/profilePick/'
+]

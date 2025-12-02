@@ -32,14 +32,17 @@ def register_auth(app):
         if request.method == 'OPTIONS':
             return
 
-        public_paths = app.config.get('PUBLIC_PATHS', ['/','/checkLogin','/users/checkNumber','/users/create'])
+        public_paths = app.config.get('PUBLIC_PATHS', ['/','/checkLogin','/users/checkNumber','/users/create', '/uploads/categories/','/uploads/advertisements/ad_images/<filename>','/uploads/profilePick/<filename>'])
         # Normalize path: strip trailing slash for comparison
         current_path = request.path.rstrip('/')
         if not current_path:  # if path was just '/', keep it as '/'
             current_path = '/'
         
+        
         # Check if current path is in public paths (exact match or normalized)
         if current_path in public_paths or request.path in public_paths:
+            return
+        if any(current_path.startswith(p)  for p in public_paths):
             return
 
         auth_header = request.headers.get('Authorization', None)

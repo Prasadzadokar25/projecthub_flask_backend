@@ -1,5 +1,6 @@
 from flask import Blueprint, send_file, request
 
+
 files_ctrl = Blueprint('files_ctrl', __name__)
 
 
@@ -15,7 +16,7 @@ def getProfilePhoto(filename):
 
 @files_ctrl.route('/uploads/categories/<filename>', methods=['GET'])
 def getCategories(filename):
-    return send_file(f"app/uploads/categories/{filename}")
+    return send_file(f"uploads/categories/{filename}")
 
 
 @files_ctrl.route('/uploads/advertisements/ad_images/<filename>', methods=['GET'])

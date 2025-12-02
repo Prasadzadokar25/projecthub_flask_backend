@@ -29,15 +29,16 @@ def check_login():
     try:
         if getattr(res, 'status_code', None) == 200:
             body = res.get_json()
-            # Expecting body['data'] to be a list with the user record
+            # Expecting body['data'] to be a dict with the user record
             user_id = None
-            if body and isinstance(body, dict) and 'data' in body and isinstance(body['data'], list) and len(body['data']) > 0:
-                user_id = body['data'][0].get('user_id')
+            if body and isinstance(body, dict) and 'data' in body and isinstance(body['data'], dict):
+                user_id = body['data'].get('user_id')
             if user_id is not None:
                 token = generate_jwt(user_id)
                 body['token'] = token
             return make_response(body, 200)
-    except Exception:
+    except Exception as e:
         # fall back to original response when something unexpected happens
+        print(f"Token generation error: {str(e)}")
         pass
     return res

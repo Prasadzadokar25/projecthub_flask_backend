@@ -10,14 +10,14 @@ class UserModel:
         self.cur = self.con.cursor(pymysql.cursors.DictCursor)
         self.con.autocommit = True
 
-    def create_user(self, user_name, user_password, user_contact, role, reference_code):
+    def create_user(self, user_name, user_password,country_code,phone_number, role, reference_code):
         """Insert a new user into the database"""
         query = """
-        INSERT INTO users (user_name, user_password, user_contact, role, reference_code)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO users (user_name, user_password, country_code, phone_number, role, reference_code)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
         try:
-            self.cur.execute(query, (user_name, user_password, user_contact, role, reference_code))
+            self.cur.execute(query, (user_name, user_password, country_code, phone_number, role, reference_code))
             self.cur.execute("SELECT LAST_INSERT_ID()")
             user_id = self.cur.fetchall()[0]['LAST_INSERT_ID()']
             self.con.commit()

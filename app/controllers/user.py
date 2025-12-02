@@ -68,7 +68,7 @@ def getUsersWithPagination():
     return res
 
 
-@user_bp.route("/", methods=["POST"])
+@user_bp.route("/create", methods=["POST"])
 @safe_route
 def addUser():
     """Add a new user"""
@@ -94,7 +94,8 @@ def addUser():
     result = user_model.create_user(
         data.get('user_name'),
         hashed_password,
-        contact,
+        country_code,
+        phone_number,
         data.get('role'),
         generate_reference_code()
     )
@@ -113,7 +114,7 @@ def addUser():
 # READ OPERATIONS
 # =======================
 
-@user_bp.route("/getUser")
+@user_bp.route("/profile")
 @safe_route
 @require_user
 def getUserById():
@@ -154,7 +155,7 @@ def checkNumber():
     user_model.close()
     
     if result['success']:
-        res = make_response({"userExist": str(result['exists']).lower()}, 200)
+        res = make_response({"userExist": result['exists']}, 200)
     else:
         res = make_response({"error": result['error']}, 500)
     

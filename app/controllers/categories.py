@@ -9,11 +9,41 @@ categories_ctrl = Blueprint('categories_ctrl', __name__)
 @safe_route
 def get_categories():
     category_Model = categoryModel()
-    # If category logic needs current user id, use request.user_id
-    # leave default behavior unchanged
-    categories = category_Model.getCategories(1)
 
-    if categories:
-        return jsonify({"status": "success", "data": categories}), 200
-    else:
-        return jsonify({"status": "error", "message": "No categories found"}), 404
+    # Validate pagination params
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 10))
+
+        if page <= 0 or limit <= 0:
+            return jsonify({
+                "status": "fail",
+                "message": "Page and limit must be positive numbers"
+            }), 400
+
+    except ValueError:
+        return jsonify({
+            "status": "fail",
+            "message": "Invalid page or limit value"
+        }), 400
+        
+    print(f"Fetching categories - Page: {page}, Limit: {limit}")
+
+    categories, total = category_Model.getCategories(page, limit)
+
+    # ❌ No categories found
+    if not categories:
+        return jsonify({
+            "status": "fail",
+            "message": "No categories found"
+        }), 404
+
+    # ✔ Data found
+    return jsonify({
+        "status": "success",
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "data": categories
+    }), 200
+

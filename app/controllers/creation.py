@@ -6,7 +6,7 @@ from flask import Blueprint, request, make_response, jsonify
 from app.utils.decorators import safe_route, require_user
 from model.creation import CreationModel
 
-creation_bp = Blueprint('creation', __name__, url_prefix='/creation')
+creation_bp = Blueprint('creation', __name__, url_prefix='/creations')
 
 
 # =======================
@@ -267,22 +267,35 @@ def get_purchased_creation_details():
 # RECENTLY ADDED CREATIONS ROUTES
 # =======================
 
-@creation_bp.route('/recentCreations/page/<page>/perPage/<perPage>', methods=['GET'])
+@creation_bp.route('/homeScreenCreations', methods=['GET'])
 @safe_route
-def get_recently_added_creations(page, perPage):
-    """Get recently added creations with pagination"""
-    current_user_id = getattr(request, 'user_id', None)
-    
+def get_home_screen_creations():
+
+    # Get current authenticated user ID from JWT
+    current_user_id = getattr(request, "user_id", None)
+
+    page = request.args.get('page', 1)
+    perPage = request.args.get('perPage', 10)
+
     creation_model = CreationModel()
-    result = creation_model.get_recently_added_creations(int(page), int(perPage), current_user_id)
+    result = creation_model.get_home_screen_creations(
+        int(page),
+        int(perPage),
+        current_user_id
+    )
     creation_model.close()
-    
+
     if result['success']:
         creations = [structure_creation_data(row) for row in result['data']]
-        res = make_response({"creations": creations, "page": int(page), "limit": int(perPage)}, 200)
+        res = make_response({
+            "data": creations,
+            "page": int(page),
+            "limit": int(perPage),
+            "current_user_id": current_user_id
+        }, 200)
     else:
         res = make_response({"error": result['error']}, 500)
-    
+
     res.headers['Access-Control-Allow-Origin'] = "*"
     return res
 

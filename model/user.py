@@ -1,4 +1,6 @@
 import pymysql
+from app.auth import generate_jwt
+
 from model.db import get_db_connection
 
 
@@ -88,7 +90,11 @@ class UserModel:
         try:
             self.cur.execute(query, (user_id,))
             result = self.cur.fetchall()
-            return {"success": True, "data": result[0] if len(result) > 0 else None}
+            body = result[0] if len(result) > 0 else None
+            if user_id is not None:
+                token = generate_jwt(user_id)
+                body['token'] = token
+            return {"success": True, "data": body if len(result) > 0 else None}
         except pymysql.MySQLError as e:
             return {"success": False, "error": f"Database error: {str(e)}"}
         except Exception as e:

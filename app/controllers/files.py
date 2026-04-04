@@ -4,14 +4,14 @@ from flask import Blueprint, send_file, request
 files_ctrl = Blueprint('files_ctrl', __name__)
 
 
-@files_ctrl.route('/app/uploads/creation/thumbnail/<filename>', methods=['GET'])
+@files_ctrl.route('/uploads/creation/thumbnail/<filename>', methods=['GET'])
 def getthumbnail(filename):
-    return send_file(f"app/uploads/creation/thumbnail/{filename}")
+    return send_file(f"uploads/creation/thumbnail/{filename}")
 
 
 @files_ctrl.route('/uploads/profilePick/<filename>', methods=['GET'])
 def getProfilePhoto(filename):
-    return send_file(f"app/uploads/profilePick/{filename}")
+    return send_file(f"uploads/profilePick/{filename}")
 
 
 @files_ctrl.route('/uploads/categories/<filename>', methods=['GET'])

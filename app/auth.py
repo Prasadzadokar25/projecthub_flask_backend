@@ -32,7 +32,7 @@ def register_auth(app):
         if request.method == 'OPTIONS':
             return
 
-        public_paths = app.config.get('PUBLIC_PATHS', ['/','/checkLogin','/users/checkNumber','/users/create', '/uploads/categories/','/uploads/advertisements/ad_images/<filename>','/uploads/profilePick/<filename>'])
+        public_paths = app.config.get('PUBLIC_PATHS', ['/','/checkLogin','/users/checkNumber','/users/create', '/uploads/categories/','/uploads/advertisements/ad_images/<filename>','/uploads/profilePick/<filename>',    '/uploads/creation/thumbnail/','/user/getUser/<user_id>'])  # Add more public paths as needed
         # Normalize path: strip trailing slash for comparison
         current_path = request.path.rstrip('/')
         if not current_path:  # if path was just '/', keep it as '/'

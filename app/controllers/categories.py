@@ -31,12 +31,7 @@ def get_categories():
 
     categories, total = category_Model.getCategories(page, limit)
 
-    # ❌ No categories found
-    if not categories:
-        return jsonify({
-            "status": "fail",
-            "message": "No categories found"
-        }), 404
+
 
     # ✔ Data found
     return jsonify({

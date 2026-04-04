@@ -1,9 +1,11 @@
 import pymysql
 from model.db import get_db_connection
+from flask import current_app
 
 
 class CreationModel:
     """Creation data access model"""
+   
     
     def __init__(self):
         self.con = get_db_connection()
@@ -171,17 +173,18 @@ class CreationModel:
         except Exception as e:
             return {"success": False, "error": f"Unexpected error: {str(e)}"}
 
-    def get_recently_added_creations(self, page_no, per_page, current_user_id):
+    def get_home_screen_creations(self, page_no, per_page, current_user_id):
+        base_url = current_app.config['BASE_URL']
         """Fetch recently added creations with pagination"""
         offset = (page_no - 1) * per_page
-        query = """
+        query = f"""
         SELECT 
             c.creation_id,
             c.creation_title,
             c.creation_description,
             c.creation_price,
-            c.creation_thumbnail,
-            c.creation_file,
+            CONCAT('{base_url}/', c.creation_thumbnail) AS creation_thumbnail,
+            CONCAT('{base_url}/', c.creation_file) AS creation_file,
             c.category_id,
             c.createtime,
             c.keyword,
@@ -191,7 +194,7 @@ class CreationModel:
             u.user_id AS seller_id,
             u.user_name AS seller_name,
             u.user_email AS seller_email,
-            u.profile_photo AS seller_profile_photo,
+            CONCAT('{base_url}/', u.profile_photo) AS seller_profile_photo,
 
             COALESCE(AVG(r.rating), 0) AS avg_rating,
             COUNT(r.rating_id) AS number_of_reviews,
@@ -210,10 +213,11 @@ class CreationModel:
         LEFT JOIN 
             creation_likes cl_user ON c.creation_id = cl_user.creation_id AND cl_user.user_id = %s
 
+        WHERE c.status = 'publish'
+    
         GROUP BY 
             c.creation_id, u.user_id
-        ORDER BY 
-            c.createtime DESC
+        
         LIMIT %s OFFSET %s
         """
         try:

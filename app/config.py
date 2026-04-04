@@ -15,5 +15,7 @@ class Config:
     # Dynamic URL prefixes (correct)
     '/uploads/categories/',
     '/uploads/advertisements/ad_images/',
-    '/files/uploads/profilePick/'
+    '/uploads/profilePick/',
+    '/uploads/creation/thumbnail/',
+    '/user/getUser/<user_id>'
 ]
